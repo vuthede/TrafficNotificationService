@@ -1,4 +1,4 @@
-package edu.bku.cse.traffic.trafficnotification.database;
+package edu.bku.cse.traffic.trafficnotification.model;
 
 import java.util.HashMap;
 

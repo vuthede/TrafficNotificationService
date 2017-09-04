@@ -1,4 +1,4 @@
-package edu.bku.cse.traffic.trafficnotification.database;
+package edu.bku.cse.traffic.trafficnotification.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -59,6 +59,11 @@ public class NearPlace {
 			if (!this.segment_state.containsKey(seg.getId()))
 				segment_state_temp.put((Long)seg.getId(), new SegmentState(Constant.STATE.ACTIVE, 0, Double.MAX_VALUE));
 			else{
+				
+				if (this.segment_state.get(seg.getId()).getState() == Constant.STATE.ACTIVE)
+					segment_state_temp.put((Long)seg.getId(), this.segment_state.get(seg.getId()));
+				
+				//May be in the future, we can reset from STATE.PASSIVE -> STATE.ACTIVE after an denta T.
 				if (this.segment_state.get(seg.getId()).getState() == Constant.STATE.READY)
 					segment_state_temp.put((Long)seg.getId(), new SegmentState(Constant.STATE.PASSIVE, 0, Double.MAX_VALUE));
 			}
@@ -84,7 +89,7 @@ public class NearPlace {
 					changeState(segId, Constant.STATE.READY, newDistance);
 				else {
 					//Indicate specific any dimension
-					if(newDistance - this.segment_state.get(segId).getDistance() <= Constant.MIN_DENLTA_DISTANCE){
+					if(newDistance - this.segment_state.get(segId).getDistance() >= Constant.MIN_DENLTA_DISTANCE){
 						this.segment_state.get(segId).setNumIncreaseBy_1();
 					}
 					else this.segment_state.get(segId).setNum(0);

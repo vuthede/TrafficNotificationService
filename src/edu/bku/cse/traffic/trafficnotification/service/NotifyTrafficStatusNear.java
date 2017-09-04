@@ -11,8 +11,8 @@ import javax.ws.rs.core.MediaType;
 import com.google.gson.Gson;
 
 import edu.bku.cse.traffic.trafficnotificaion.query.QueryHelper;
-import edu.bku.cse.traffic.trafficnotification.database.AllNearPlace;
-import edu.bku.cse.traffic.trafficnotification.database.NearPlace;
+import edu.bku.cse.traffic.trafficnotification.model.AllNearPlace;
+import edu.bku.cse.traffic.trafficnotification.model.NearPlace;
 import edu.bku.cse.traffic.trafficnotification.model.SegmentInfo;
 import edu.bku.cse.traffic.trafficnotion.utils.Constant;
 
@@ -27,10 +27,17 @@ public class NotifyTrafficStatusNear {
 	@GET
 	@Consumes({ MediaType.APPLICATION_JSON })
 	public String notify(@QueryParam("device_id") long device_id, @QueryParam("lattitude") double lat, @QueryParam("longtitude") double lng){
+		//Get all segmentInfo which are in congestion
 		ArrayList<SegmentInfo> segInfos = QueryHelper.getCongestedSegmentInfosInRetangle(lat, lng, Constant.R);
 		
-		//Update nearBy-segInfos in R of this device_id.
+		//If NearPlace of device_id haven't exist already. Then we create it.
 		NearPlace np = AllNearPlace.getData().get(device_id);
+		if(np == null){
+			AllNearPlace.getData().put(device_id, new NearPlace(device_id));
+		}
+		
+		//Update nearBy-segInfos in R of this device_id.
+		np = AllNearPlace.getData().get(device_id);
 		np.updateSegmentState(lat, lng, segInfos);
 		
 		//Get seginFos with "ready" state. there are 3 states {ready, passive, active}
